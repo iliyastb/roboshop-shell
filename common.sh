@@ -140,13 +140,13 @@ python() {
 
 golang() {
   print_head "Install GoLang"
-  yum install golang -y
+  yum install golang -y &>>${log_file}
   status_check $?
 
   app_prereq_setup
 
   print_head "Download Dependencies"
-  go mod init dispatch ; go get ; go build
+  go mod init dispatch ; go get ; go build &>>${log_file}
   status_check $?
 
   # SystemD Function
