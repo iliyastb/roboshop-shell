@@ -1,4 +1,4 @@
-source commom.sh
+source common.sh
 
 roboshop_app_password=$1
 
