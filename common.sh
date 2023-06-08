@@ -44,7 +44,7 @@ schema_setup() {
     status_check $?
 
     print_head "Load Schema"
-    mongo --host give ip here </app/schema/${component}.js &>>${log_file}
+    mongo --host ip </app/schema/${component}.js &>>${log_file}
     status_check $?
   elif [ "${schema_type}" == "mysql" ]; then
     print_head "Install MySQL Client"
@@ -52,7 +52,7 @@ schema_setup() {
     status_check $?
 
     print_head "Load Schema"
-    mysql --host give ip here -uroot -p${mysql_root_password} < /app/schema/shipping.sql &>>${log_file}
+    mysql --host ip -uroot -p${mysql_root_password} < /app/schema/shipping.sql &>>${log_file}
     status_check $?
   fi
 }
