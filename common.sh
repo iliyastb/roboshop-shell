@@ -11,7 +11,7 @@ status_check() {
     echo SUCCESS
   else
     echo FAILURE
-    echo "Read the log file $(log-file) for more information about error"
+    echo "Read the log file ${log_file} for more information about error"
     exit 1
   fi
 }
@@ -81,7 +81,7 @@ app_prereq_setup() {
   status_check $?
 
   print_head "Extracting App Content"
-  unzip /tmp/$(component).zip &>>${log_file}
+  unzip /tmp/${component}.zip &>>${log_file}
   status_check $?
 }
 
