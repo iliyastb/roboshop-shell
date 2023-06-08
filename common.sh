@@ -100,9 +100,8 @@ nodejs() {
   npm install &>>${log_file}
   status_check $?
 
-  schema_setup
-
   systemd_setup
+  schema_setup
 }
 
 java() {
@@ -118,10 +117,10 @@ java() {
   status_check $?
 
   # Schema Setup Function
-  schema_setup
+  systemd_setup
 
   # SystemD Function
-  systemd_setup
+  schema_setup
 }
 
 python() {
