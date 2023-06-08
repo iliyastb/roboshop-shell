@@ -19,7 +19,7 @@ print_head "Installing MySQL Server"
 yum install mysql-community-server -y &>>${log_file}
 status_check $?
 
-print_head " Start MYSQL Service"
+print_head "Start MYSQL Service"
 systemctl enable mysqld &>>${log_file}
 systemctl start mysqld &>>${log_file}
 status_check $?
