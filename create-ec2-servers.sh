@@ -4,7 +4,7 @@ create_ec2() {
   PRIVATE_IP=$(aws ec2 run-instances \
       --image-id ${AMI_ID} \
       --instance-type t2.micro \
-      --security-group-ids ${SGID} \
+      --security-group-ids sg-0f1959ab92bc12167 \
       --user-data file:///tmp/user-data \
       | jq '.Instances[].PrivateIpAddress' | sed -e 's/"//g')
 
