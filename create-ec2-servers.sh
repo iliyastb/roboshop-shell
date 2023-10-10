@@ -1,10 +1,14 @@
+ZONE_ID="Z01272351LK3NIV2TJGOQ"
+DOMAIN="devtb.online"
+SG_NAME="allow-all"
+
 create_ec2() {
   echo -e '#!/bin/bash' >/tmp/user-data
   echo -e "\nset-hostname ${COMPONENT}" >>/tmp/user-data
   PRIVATE_IP=$(aws ec2 run-instances \
       --image-id ${AMI_ID} \
       --instance-type t2.micro \
-      --security-group-ids sg-0f1959ab92bc12167 \
+      --security-group-ids ${SGID} \
       --user-data file:///tmp/user-data \
       | jq '.Instances[].PrivateIpAddress' | sed -e 's/"//g')
 
