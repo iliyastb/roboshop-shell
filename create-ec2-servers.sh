@@ -8,6 +8,7 @@ create_ec2() {
   PRIVATE_IP=$(aws ec2 run-instances \
       --image-id ${AMI_ID} \
       --instance-type t2.micro \
+      --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${COMPONENT}}, {Key=Monitor,Value=yes}]" \
       --security-group-ids ${SGID} \
       --user-data file:///tmp/user-data \
       | jq '.Instances[].PrivateIpAddress' | sed -e 's/"//g')
@@ -23,7 +24,6 @@ create_ec2() {
   fi
 }
 
-# Main Program
 AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=Centos-8-DevOps-Practice" | jq '.Images[].ImageId' | sed -e 's/"//g')
 if [ -z "${AMI_ID}" ]; then
   echo "AMI_ID not found"
