@@ -34,3 +34,7 @@ create_ec2_main() {
      exit 1
   fi
 }
+
+for component in frontend; do
+  create_ec2_main
+done
