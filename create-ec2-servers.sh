@@ -36,7 +36,29 @@ if [ -z "${SGID}" ]; then
   exit 1
 fi
 
-for component in catalogue cart user shipping payment frontend mongodb mysql rabbitmq redis dispatch; do
+for component in catalogue cart user shipping payment mongodb mysql rabbitmq redis dispatch; do
   COMPONENT="${component}-dev"
   create_ec2
 done
+
+create_ec2_main() {
+  echo -e '#!/bin/bash' >/tmp/user-data
+  echo -e "\nset-hostname frontend" >>/tmp/user-data
+  PUBLIC_IP=$(aws ec2 run-instances \
+      --image-id ${AMI_ID} \
+      --instance-type t2.micro \
+      --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=frontend}, {Key=Monitor,Value=yes}]" \
+      --security-group-ids ${SGID} \
+      --user-data file:///tmp/user-data \
+      | jq '.Instances[].PrivateIpAddress' | sed -e 's/"//g')
+
+  sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/COMPONENT/frontend/" -e "s/DOMAIN/devtb.online/" route53-main.json >/tmp/record.json
+  aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
+
+  if [ $? -eq 0 ]; then
+    echo "Server Created - SUCCESS - DNS RECORD - devtb.online"
+  else
+     echo "Server Created - FAILED - DNS RECORD - devtb.online"
+     exit 1
+  fi
+}
