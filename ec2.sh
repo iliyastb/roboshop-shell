@@ -24,7 +24,11 @@ create_ec2() {
   fi
 }
 
-create_ec2
+PUB_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=instance-state-name,Values=running --output text | sed -e 's/"//g')
+if [ -z "${PUB_IP}" ]; then
+  echo "IP not found"
+  exit 1
+fi
 
 AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=Centos-8-DevOps-Practice" | jq '.Images[].ImageId' | sed -e 's/"//g')
 if [ -z "${AMI_ID}" ]; then
@@ -38,8 +42,4 @@ if [ -z "${SGID}" ]; then
   exit 1
 fi
 
-PUB_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=instance-state-name,Values=running --output text | sed -e 's/"//g')
-if [ -z "${PUB_IP}" ]; then
-  echo "IP not found"
-  exit 1
-fi
+create_ec2
