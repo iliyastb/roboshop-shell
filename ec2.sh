@@ -1,6 +1,7 @@
 ZONE_ID="Z01272351LK3NIV2TJGOQ"
 DOMAIN="devtb.online"
 SG_NAME="allow-all"
+COMPONENT="frontend"
 
 create_ec2() {
   echo -e '#!/bin/bash' >/tmp/user-data
@@ -11,10 +12,10 @@ create_ec2() {
       --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${COMPONENT}}, {Key=Monitor,Value=yes}]" \
       --security-group-ids "${SGID}" \
       --user-data file:///tmp/user-data \
-      | aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" "Tags "--output text | sed -e 's/"//g')
+      | aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=instance-state-name,Values=running --output text | sed -e 's/"//g')
 
-  sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/COMPONENT/${COMPONENT}/" -e "s/DOMAIN/${DOMAIN}/" route53.json >/tmp/record.json
-  aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
+  sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record1.json
+  aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record1.json 2>/dev/null
 
   if [ $? -eq 0 ]; then
     echo "Server Created - SUCCESS - DNS RECORD - ${DOMAIN}"
@@ -23,6 +24,8 @@ create_ec2() {
     exit 1
   fi
 }
+
+create ec2
 
 AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=Centos-8-DevOps-Practice" | jq '.Images[].ImageId' | sed -e 's/"//g')
 if [ -z "${AMI_ID}" ]; then
@@ -35,8 +38,3 @@ if [ -z "${SGID}" ]; then
   echo "Given Security Group does not exit"
   exit 1
 fi
-
-for component in frontend; do
-  COMPONENT="${component}"
-  create_ec2
-done
