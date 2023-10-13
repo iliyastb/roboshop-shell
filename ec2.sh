@@ -13,7 +13,7 @@ create_ec2() {
       --security-group-ids "${SGID}" \
       --user-data file:///tmp/user-data
 
-  sed -e "s/IPADDRESS/${PUB_IP}/" -e "s/COMPONENT/${COMPONENT}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record1.json
+  sed -e "s/IPADDRESS/${PUB_IP}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record1.json
   aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record1.json 2>/dev/null
 
   if [ $? -eq 0 ]; then
