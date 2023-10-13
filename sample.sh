@@ -1,1 +1,1 @@
-aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters "Tags=[Key=Monitor]" --output text | sed -e 's/"//g'
+aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters "tag-key=Monitor" --output text | sed -e 's/"//g'
