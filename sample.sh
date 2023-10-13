@@ -1,1 +1,1 @@
-aws ec2 describe-instances --query 'Reservations[*].Instances[*].[PublicIpAddress]' | sed -e 's/"//g'
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text | sed -e 's/"//g'
