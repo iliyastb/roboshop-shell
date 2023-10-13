@@ -1,1 +1,1 @@
-aws ec2 describe-instances --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output table
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].[PublicIpAddress]'
