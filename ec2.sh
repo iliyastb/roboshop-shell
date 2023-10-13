@@ -11,8 +11,7 @@ create_ec2() {
       --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${COMPONENT}}, {Key=Monitor,Value=yes}]" \
       --security-group-ids "${SGID}" \
       --user-data file:///tmp/user-data \
-      --query 'Reservations[*].Instances[*].[PublicIpAddress]' \
-      --output text | sed -e 's/"//g')
+      | jq 'Reservations[*].Instances[*].PublicIpAddress' | sed -e 's/"//g')
 
   sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/COMPONENT/${COMPONENT}/" -e "s/DOMAIN/${DOMAIN}/" route53.json >/tmp/record.json
   aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
