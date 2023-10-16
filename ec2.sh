@@ -24,6 +24,8 @@ create_ec2() {
   fi
 }
 
+create_ec2
+
 PUB_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=tag:Monitor,Values=yes --output text | sed -e 's/"//g')
 if [ -z "${PUB_IP}" ]; then
   echo "IP not found"
@@ -41,5 +43,3 @@ if [ -z "${SGID}" ]; then
   echo "Given Security Group does not exit"
   exit 1
 fi
-
-create_ec2
