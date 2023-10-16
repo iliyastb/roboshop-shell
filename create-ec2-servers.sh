@@ -11,9 +11,9 @@ create_ec2() {
       --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${COMPONENT}}, {Key=Monitor,Value=yes}]" \
       --security-group-ids "${SGID}" \
       --user-data file:///tmp/user-data \
-      | jq '.Instances[].PrivateIpAddress' | sed -e 's/"//g')
+      | aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=tag:Name,Values=workstation --output text | sed -e 's/"//g')
 
-  sed -e "s/IPADDRESS/${PRIVATE_IP}/" -e "s/COMPONENT/${COMPONENT}/" -e "s/DOMAIN/${DOMAIN}/" route53.json >/tmp/record.json
+  sed -e "s/IPADDRESS/${PRIVATE_IP}/" -e "s/COMPONENT/${COMPONENT}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record.json
   aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
 
   if [ $? -eq 0 ]; then
@@ -40,3 +40,5 @@ for component in catalogue cart user shipping payment mongodb mysql rabbitmq red
   COMPONENT="${component}-dev"
   create_ec2
 done
+
+#jq '.Instances[].PrivateIpAddress' | sed -e 's/"//g'

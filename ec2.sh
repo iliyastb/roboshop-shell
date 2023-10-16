@@ -7,7 +7,7 @@ create_ec2() {
   echo -e '#!/bin/bash' >/tmp/user-data
   echo -e "\nset-hostname ${COMPONENT}" >>/tmp/user-data
   aws ec2 run-instances \
-      --image-id "ami-03265a0778a880afb" \
+      --image-id ${AMI_ID} \
       --instance-type t2.micro \
       --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${COMPONENT}}, {Key=Monitor,Value=yes}]" \
       --security-group-ids "${SGID}" \
