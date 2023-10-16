@@ -24,7 +24,7 @@ create_ec2() {
   fi
 }
 
-PUB_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=instance-state-name,Values=running --output text | sed -e 's/"//g')
+PUB_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=tag:Monitor,Values=yes --output text | sed -e 's/"//g')
 if [ -z "${PUB_IP}" ]; then
   echo "IP not found"
   exit 1
