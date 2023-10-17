@@ -59,7 +59,7 @@ fi
 
 frontend
 
-#for component in catalogue cart user shipping payment mongodb mysql rabbitmq redis dispatch; do
-#  COMPONENT="${component}"
-#  ec2
-#done
+for component in catalogue cart user shipping payment mongodb mysql rabbitmq redis dispatch; do
+  COMPONENT="${component}"
+  ec2
+done
