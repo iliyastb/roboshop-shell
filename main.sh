@@ -14,8 +14,8 @@ frontend() {
 
   PUBLIC_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=tag:Name,Values=frontend --output text)
 
-  if  sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record.json
-      aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
+  if  sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record1.json
+      aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record1.json 2>/dev/null
   then
     echo "Server Created - SUCCESS - DNS RECORD - ${DOMAIN}"
   else
