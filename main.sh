@@ -2,6 +2,7 @@ ZONE_ID="Z01272351LK3NIV2TJGOQ"
 DOMAIN="devtb.online"
 SG_NAME="allow-all"
 
+
 frontend() {
   echo -e '#!/bin/bash' >/tmp/user-data
   echo -e "\nset-hostname frontend" >>/tmp/user-data
@@ -11,18 +12,24 @@ frontend() {
       --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=frontend}, {Key=Monitor,Value=yes}]" \
       --security-group-ids "${SGID}" \
       --user-data file:///tmp/user-data >>/tmp/user-data
-
-  if  sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record1.json
-      aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record1.json 2>/dev/null
-  then
-    echo "Server Created - SUCCESS - DNS RECORD - ${DOMAIN}"
-  else
-    echo "Server Created - FAILED - DNS RECORD - ${DOMAIN}"
-    exit 1
-  fi
-
-  PUBLIC_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=tag:Name,Values=frontend --output text)
 }
+
+publicip(){
+  aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=tag:Name,Values=frontend --output text
+}
+
+PUBLIC_IP="publicip"
+
+if  sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record1.json
+    aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record1.json 2>/dev/null
+then
+  echo "Server Created - SUCCESS - DNS RECORD - ${DOMAIN}"
+else
+  echo "Server Created - FAILED - DNS RECORD - ${DOMAIN}"
+  exit 1
+fi
+
+
 
 AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=Centos-8-DevOps-Practice" | jq '.Images[].ImageId' | sed -e 's/"//g')
 if [ -z "${AMI_ID}" ]; then
