@@ -2,7 +2,7 @@ ZONE_ID="Z01272351LK3NIV2TJGOQ"
 DOMAIN="devtb.online"
 SG_NAME="allow-all"
 
-ec2() {
+create_ec2() {
   echo -e '#!/bin/bash' >/tmp/user-data
   echo -e "\nset-hostname ${COMPONENT}" >>/tmp/user-data
   PRIVATE_IP=$(aws ec2 run-instances \
@@ -57,9 +57,9 @@ if [ -z "${SGID}" ]; then
   exit 1
 fi
 
-frontend
-
 for component in catalogue cart user shipping payment mongodb mysql rabbitmq redis dispatch; do
   COMPONENT="${component}"
-  ec2
+  create_ec2
 done
+
+frontend
