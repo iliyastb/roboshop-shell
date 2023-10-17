@@ -2,27 +2,6 @@ ZONE_ID="Z01272351LK3NIV2TJGOQ"
 DOMAIN="devtb.online"
 SG_NAME="allow-all"
 
-create_ec2() {
-  echo -e '#!/bin/bash' >/tmp/user-data
-  echo -e "\nset-hostname ${COMPONENT}" >>/tmp/user-data
-  PRIVATE_IP=$(aws ec2 run-instances \
-      --image-id "${AMI_ID}" \
-      --instance-type t2.micro \
-      --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${COMPONENT}}, {Key=Monitor,Value=yes}]" \
-      --security-group-ids "${SGID}" \
-      --user-data file:///tmp/user-data \
-      | jq '.Instances[].PrivateIpAddress' | sed -e 's/"//g')
-
-  if  sed -e "s/IPADDRESS/${PRIVATE_IP}/" -e "s/COMPONENT/${COMPONENT}/" -e "s/DOMAIN/${DOMAIN}/" route53.json >/tmp/record.json
-      aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
-  then
-    echo "Server Created - SUCCESS - DNS RECORD - ${COMPONENT}.${DOMAIN}"
-  else
-    echo "Server Created - FAILED - DNS RECORD - ${COMPONENT}.${DOMAIN}"
-    exit 1
-  fi
-}
-
 frontend() {
   echo -e '#!/bin/bash' >/tmp/user-data
   echo -e "\nset-hostname frontend" >>/tmp/user-data
@@ -58,8 +37,3 @@ if [ -z "${SGID}" ]; then
 fi
 
 frontend
-
-for component in catalogue cart user shipping payment mongodb mysql rabbitmq redis dispatch; do
-  COMPONENT="${component}"
-  create_ec2
-done
