@@ -29,7 +29,7 @@ frontend() {
   aws ec2 run-instances \
       --image-id "${AMI_ID}" \
       --instance-type t2.micro \
-      --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=frontend, {Key=Monitor,Value=yes}]" \
+      --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=frontend}, {Key=Monitor,Value=yes}]" \
       --security-group-ids "${SGID}" \
       --user-data file:///tmp/user-data
 
