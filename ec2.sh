@@ -9,7 +9,7 @@ create_ec2() {
       --image-id "${AMI_ID}" \
       --instance-type t2.micro \
       --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${COMPONENT}}, {Key=Monitor,Value=yes}]" \
-      --security-group-ids "${SGID}" \
+      --security-group-ids "${SG_ID}" \
       --user-data file:///tmp/user-data \
       | jq '.Instances[].PrivateIpAddress' | sed -e 's/"//g')
 
@@ -23,19 +23,14 @@ create_ec2() {
   fi
 }
 
-PUBLIC_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters "Name=tag:Name,Values=workstation --output text" | sed -e 's/"//g')
-
-sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/COMPONENT/${COMPONENT}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record.json
-aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
-
 AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=Centos-8-DevOps-Practice" | jq '.Images[].ImageId' | sed -e 's/"//g')
 if [ -z "${AMI_ID}" ]; then
   echo "AMI_ID not found"
   exit 1
 fi
 
-SGID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=${SG_NAME}" | jq '.SecurityGroups[].GroupId' | sed -e 's/"//g')
-if [ -z "${SGID}" ]; then
+SG_ID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=${SG_NAME}" | jq '.SecurityGroups[].GroupId' | sed -e 's/"//g')
+if [ -z "${SG_ID}" ]; then
   echo "Given Security Group does not exit"
   exit 1
 fi
@@ -47,3 +42,7 @@ for component in catalogue cart user shipping frontend payment mongodb mysql rab
   create_ec2
 done
 
+PUBLIC_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters "Name=tag:Name,Values=frontend --output text" | sed -e 's/"//g')
+
+sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record.json
+aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
