@@ -23,27 +23,10 @@ create_ec2() {
   fi
 }
 
-frontend() {
-  echo -e '#!/bin/bash' >/tmp/user-data
-  echo -e "\nset-hostname frontend" >>/tmp/user-data
-  aws ec2 run-instances \
-      --image-id "${AMI_ID}" \
-      --instance-type t2.micro \
-      --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=frontend}, {Key=Monitor,Value=yes}]" \
-      --security-group-ids "${SGID}" \
-      --user-data file:///tmp/user-data >>/tmp/user-data
+PUBLIC_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters "Name=tag:Name,Values=workstation --output text" | sed -e 's/"//g')
 
-  PUBLIC_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].[PublicIpAddress]" --filters Name=tag:Name,Values=frontend --output text)
-
-  if  sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record.json
-      aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
-  then
-    echo "Server Created - SUCCESS - DNS RECORD - ${DOMAIN}"
-  else
-    echo "Server Created - FAILED - DNS RECORD - ${DOMAIN}"
-    exit 1
-  fi
-}
+sed -e "s/IPADDRESS/${PUBLIC_IP}/" -e "s/COMPONENT/${COMPONENT}/" -e "s/DOMAIN/${DOMAIN}/" route53-main.json >/tmp/record.json
+aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/record.json 2>/dev/null
 
 AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=Centos-8-DevOps-Practice" | jq '.Images[].ImageId' | sed -e 's/"//g')
 if [ -z "${AMI_ID}" ]; then
@@ -59,7 +42,8 @@ fi
 
 frontend
 
-for component in catalogue cart user shipping payment mongodb mysql rabbitmq redis dispatch; do
+for component in catalogue cart user shipping frontend payment mongodb mysql rabbitmq redis dispatch; do
   COMPONENT="${component}"
   create_ec2
 done
+
