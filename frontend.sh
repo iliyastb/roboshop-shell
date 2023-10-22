@@ -4,6 +4,10 @@ print_head "Installing Nginx"
 dnf install nginx -y &>>${log_file}
 status_check $?
 
+print_head "Starting Nginx"
+systemctl enable nginx &>>${log_file} ; systemctl start nginx &>>${log_file}
+status_check $?
+
 print_head "Copying Nginx Config for RoboShop"
 cp ${code_dir}/configs/nginx-roboshop.conf /etc/nginx/default.d/roboshop.conf &>>${log_file}
 status_check $?
@@ -20,8 +24,4 @@ cd /usr/share/nginx/html/
 
 print_head "Extracting Downloaded Frontend"
 unzip /tmp/frontend.zip &>>${log_file}
-status_check $?
-
-print_head "Starting nginx"
-systemctl enable nginx &>>${log_file} ; systemctl start nginx &>>${log_file}
 status_check $?
