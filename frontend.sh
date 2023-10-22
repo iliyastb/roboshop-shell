@@ -8,9 +8,9 @@ print_head "Starting Nginx"
 systemctl enable nginx &>>${log_file} ; systemctl start nginx &>>${log_file}
 status_check $?
 
-print_head "Copying Nginx Config for RoboShop"
-cp ${code_dir}/configs/nginx-roboshop.conf /etc/nginx/default.d/roboshop.conf &>>${log_file}
-status_check $?
+#print_head "Copying Nginx Config for RoboShop"
+#cp ${code_dir}/configs/nginx-roboshop.conf /etc/nginx/default.d/roboshop.conf &>>${log_file}
+#status_check $?
 
 print_head "Removing Old Content"
 rm -rf /usr/share/nginx/html/* &>>${log_file}
