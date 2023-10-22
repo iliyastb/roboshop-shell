@@ -22,7 +22,7 @@ print_head "Copying Nginx Config for RoboShop"
 cp ${code_dir}/configs/nginx-roboshop.conf /etc/nginx/default.d/roboshop.conf &>>${log_file}
 status_check $?
 
-print_head "Enable & Start the Nginx"
+print_head "Enable & Starting the Nginx"
 systemctl enable nginx &>>${log_file}
 systemctl start nginx &>>${log_file}
 status_check $?
