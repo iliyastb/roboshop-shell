@@ -1,7 +1,7 @@
 source common.sh
 
 print_head "Installing Nginx"
-yum install nginx -y &>>${log_file}
+dnf install nginx -y &>>${log_file}
 status_check $?
 
 print_head "Removing Old Content"
