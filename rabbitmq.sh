@@ -7,7 +7,7 @@ if [ -z "${roboshop_app_password}" ]; then
   exit 1
 fi
 
-print_head "Setup Erlang repos "
+print_head "Setup Erlang Repos "
 curl -s https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh | bash &>>${log_file}
 status_check $?
 

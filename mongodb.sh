@@ -1,6 +1,6 @@
 source common.sh
 
-print_head "Setup MongoDB repository"
+print_head "Setup MongoDB Repository"
 cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>${log_file}
 status_check $?
 

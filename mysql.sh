@@ -7,7 +7,7 @@ if [ -z "${mysql_root_password}" ]; then
   exit 1
 fi
 
-print_head "Disabling MySQL 8 Version"
+print_head "Disabling MySQL Version 8"
 yum module disable mysql -y &>>${log_file}
 status_check $?
 

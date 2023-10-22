@@ -1,6 +1,6 @@
 source common.sh
 
-print_head "Installing Redis Repo files"
+print_head "Installing Redis repo files"
 yum install https://rpms.remirepo.net/enterprise/remi-release-8.rpm -y &>>${log_file}
 status_check $?
 
