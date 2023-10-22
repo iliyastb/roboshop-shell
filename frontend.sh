@@ -9,8 +9,6 @@ systemctl enable nginx &>>${log_file}
 systemctl start nginx &>>${log_file}
 status_check $?
 
-sleep 10
-
 print_head "Removing Old Content"
 rm -rf /usr/share/nginx/html/* &>>${log_file}
 status_check $?
