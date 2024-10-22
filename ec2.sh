@@ -1,5 +1,5 @@
 ZONE_ID="Z0519871SX8ZUH6ORUV5"
-DOMAIN="devtb.online"
+DOMAIN="devtb.in.net"
 SG_NAME="allow-all"
 
 create_ec2() {
